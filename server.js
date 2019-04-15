@@ -16,7 +16,7 @@ db.on('error', (error) => {
 });
 
 // Initialize express html routes
-htmlRoutes();
+htmlRoutes(app, db);
 
 // Listen on port 3000
 app.listen(PORT, () => {

@@ -9,27 +9,30 @@ export default (app, db) => {
 
   app.get('/all', (req, res) => {
     db.newsScraper.find({}, (err, data) => {
-      res.json(data);
+      if (err) {
+        throw err;
+      } else {
+        res.json(data);
+      }
     });
   });
 
-  app.get('/', (req, res) => {
-    get('https://www.infowars.com/category/world-news/').then((response) => {
+  app.get('/import', (req, res) => {
+    get('http://www.infowars.com/category/world-news/').then((response) => {
       const $ = load(response.data);
+      const articles = db.newsScraper.find().sort({ index: -1 }).limit(10);
+      const count = db.newsScraper.count();
       $('div.article').each((i, element) => {
         const title = $(element).find('h3').text();
         const description = $(element).find('h4').text();
         const link = $(element).find('a').attr('href');
-        const img = $(element).find('img').attr('src');
-        const articles = db.newsScraper.find().sort({ index: -1 }).limit(10);
-        const count = db.newsScraper.count();
+        const img = $(element).find('img') ? $(element).find('img').attr('src') : 'n/a';
         const numPages = Math.ceil(count / 10);
-        db.scraper.update(
+        db.newsScraper.update(
           {
             title,
           },
           {
-            index: count + 1,
             title,
             description,
             link,
@@ -39,7 +42,7 @@ export default (app, db) => {
             upsert: true,
           },
         );
-        res.send({
+        res.json({
           articles,
           numPages,
         });
