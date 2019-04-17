@@ -14,6 +14,7 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
-    "eslint.autoFixOnSave": true,
+    'eslint.autoFixOnSave': true,
+    "import/no-unresolved": "off",
   },
 };
